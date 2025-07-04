@@ -1,0 +1,205 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Cloud, CloudRain, Search, Settings, Sun } from "lucide-react";
+
+
+export default function Weather() {
+  const [weatherData, setWeatherData] = useState<any>(null);
+  const [cityName, setCityName] = useState("");
+  const [activeTab, setActiveTab] = useState<number>(0);
+
+  const week = [
+    { day: "Sun", icon: <Sun />, temp: "15°-3°" },
+    { day: "Mon", icon: <CloudRain />, temp: "12°-7°" },
+    { day: "Tue", icon: <Cloud />, temp: "9°-7°" },
+    { day: "Wed", icon: <CloudRain />, temp: "8°-1°" },
+    { day: "Thurs", icon: <Cloud />, temp: "5°-2°" },
+    { day: "Fri", icon: <Sun />, temp: "4°-4°" },
+    { day: "Sat", icon: <Sun />, temp: "3°-3°" },
+  ];
+
+  const tabs: string[] = ["Today", "Week"];
+
+  const getWeather = async (city = cityName) => {
+    if (!city) {
+      return;
+    }
+    try {
+      const response = await axios.get(
+        "http://api.weatherapi.com/v1/current.json",
+        {
+          params: {
+            key: "770fc41b657f485f8c160300250107",
+            q: city,
+            api: "yes",
+          },
+        }
+      );
+      if (response.status === 200) {
+        setWeatherData(response.data);
+      } else {
+        console.error("Failed to Fetch Data");
+      }
+    } catch (error) {
+      console.error("Error Occuring ", error);
+    }
+  };
+
+  useEffect(() => {
+    getWeather();
+    // eslint-disable-next-line
+  }, []);
+
+  // Helper for displaying weather data or fallback
+  const temp = weatherData?.current?.temp_c ?? 12;
+  const condition = weatherData?.current?.condition?.text ?? "Mostly Cloudy";
+  const rain = weatherData?.current?.precip_mm
+    ? `${weatherData.current.precip_mm}%`
+    : "30%";
+  const city = weatherData?.location?.name ?? "New York, NY, USA";
+  const time = weatherData?.location?.localtime ?? "Monday, 16:00";
+
+  return (
+    <div className="h-screen bg-white p-10">
+      <div className="flex  flex-col md:flex-row h-screen">
+        {/* Left Panel */}
+        <div className="bg-white">
+          <div className="bg-gradient-to-br from-yellow-100 to-blue-100 min-h-screen p-6 rounded-l-lg flex flex-col">
+            {/* Search */}
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center bg-white rounded-xl px-3 py-2 shadow-sm w-full">
+                <Search className="text-gray-400 mr-2" />
+                <input
+                  type="text"
+                  placeholder="Search for places..."
+                  className="w-full bg-transparent outline-none"
+                  value={cityName}
+                  onChange={(e) => setCityName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      getWeather(e.currentTarget.value);
+                    }
+                  }}
+                />
+              </div>
+              <button className="ml-3 p-2 rounded-full hover:bg-gray-200 transition">
+                <Settings className="text-gray-500" />
+              </button>
+            </div>
+            {/* Weather Icon and Info */}
+            <div className="flex flex-col items-center">
+              <div className="relative mb-4">
+                <span className="absolute left-0 top-0 w-24 h-24 bg-yellow-300 rounded-full opacity-40 blur-2xl"></span>
+                <CloudRain className="text-yellow-400 text-[90px] drop-shadow-lg" />
+              </div>
+              <div className="text-5xl font-bold text-gray-800 mb-2">
+                {temp}°C
+              </div>
+              <div className="text-gray-500 mb-6">{time}</div>
+              <div className="flex items-center gap-2 mb-2">
+                <Cloud className="text-gray-400" />
+                <span className="text-gray-600 text-sm">{condition}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CloudRain className="text-blue-400" />
+                <span className="text-blue-700 text-sm">Rain - {rain}</span>
+              </div>
+            </div>
+            {/* Location */}
+            <div className="rounded-xl overflow-hidden mt-8">
+              <img
+                src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80"
+                alt="city"
+                className="w-full h-20 object-cover"
+              />
+              <div className="bg-white text-gray-700 text-center py-2 font-semibold">
+                {city}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="bg-gray-100 p-6 flex-1 space-y-10  ">
+          <div className="flex space-x-6 ">
+            {tabs.map((tab, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveTab(index)}
+                className={`text-base font-semibold transition duration-200 ${
+                  activeTab === index
+                    ? "border-b-2 border-blue-600 text-blue-600"
+                    : "text-gray-600 hover:text-blue-500"
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+          {/* Week Forecast */}
+          <div className="grid grid-cols-7 gap-2">
+            {week.map((w, index) => (
+              <div
+                key={index}
+                className="flex bg-white rounded-xl flex-col items-center px-4 py-6 space-y-2"
+              >
+                <div className="text-2xl mb-1">{w.icon}</div>
+                <div className="font-semibold">{w.day}</div>
+                <div className="text-gray-500 text-sm">{w.temp}</div>
+              </div>
+            ))}
+          </div>
+          {/* Today's Highlights */}
+          <div className="space-y-8">
+            <p className="font-bold">Today's Highlights</p>
+            <div className="grid grid-cols-3 gap-6">
+              <div className="bg-white p-6 rounded-2xl">
+                <div className="text-gray-500 mb-2">UV Index</div>
+                <div className="text-3xl font-bold text-yellow-500 mb-1">5</div>
+                <div className="w-full h-2 bg-yellow-200 rounded-full">
+                  <div className="h-2 bg-yellow-400 rounded-full w-1/2"></div>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-2xl">
+                <div className="text-gray-500 mb-2">Wind Status</div>
+                <div className="text-3xl font-bold text-black-500 mb-1">
+                  7.70 <span className="text-lg font-normal">km/h</span>
+                </div>
+                <div className="text-gray-600">WSW</div>
+              </div>
+              <div className="bg-white p-6 rounded-2xl">
+                <div className="text-gray-500 mb-2">Sunrise & Sunset</div>
+                <div className="flex gap-2 text-yellow-300">
+                  <span>↑</span>
+                  <span className="font-semibold text-gray-700">6:35 AM</span>
+                  <span className="text-gray-400">1m 46s</span>
+                </div>
+                <div className="flex gap-2 text-yellow-300">
+                  <span>↓</span>
+                  <span className="font-semibold text-gray-700">5:42 PM</span>
+                  <span className="text-gray-400">1m 46s</span>
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl p-5 flex flex-col items-center">
+                <div className="text-gray-500 mb-2">Humidity</div>
+                <div className="text-3xl font-bold text-blue-400 mb-1">12%</div>
+                <div className="text-gray-600">Normal 👍🏻</div>
+              </div>
+              <div className="bg-white rounded-xl p-5 flex flex-col items-center">
+                <div className="text-gray-500 mb-2">Visibility</div>
+                <div className="text-3xl font-bold text-blue-400 mb-1">
+                  5.2 <span className="text-lg font-normal">km</span>
+                </div>
+                <div className="text-gray-600">Average 😌</div>
+              </div>
+              <div className="bg-white rounded-xl p-5 flex flex-col items-center">
+                <div className="text-gray-500 mb-2">Air Quality</div>
+                <div className="text-3xl font-bold text-red-400 mb-1">105</div>
+                <div className="text-gray-600">Unhealthy 👎🏻</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
