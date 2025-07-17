@@ -1,6 +1,6 @@
 "use client";
 
-import { Cloudy, Home, House, Volleyball } from "lucide-react";
+import { Cloudy, House, Volleyball } from "lucide-react";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 

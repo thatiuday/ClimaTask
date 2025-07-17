@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useCallback} from "react";
 import axios from "axios";
 import { Cloud, CloudRain, Search, Settings, Sun } from "lucide-react";
 
@@ -34,29 +34,35 @@ export default function Weather() {
 
   const tabs = ["Today", "Week"];
 
-  const getWeather = async (city = cityName) => {
-    if (!city) return;
-    try {
-      const response = await axios.get(
-        "https://api.weatherapi.com/v1/current.json",
-        {
-          params: {
-            key: process.env.NEXT_PUBLIC_WEATHER_API_KEY,
-            q: city,
-          },
-        }
-      );
-      if (response.status === 200) {
-        setWeatherData(response.data);
-      }
-    } catch (error) {
-      console.error("Error fetching weather data:", error);
-    }
-  };
+ const getWeather = useCallback(
+   async (city = cityName) => {
+     if (!city) return;
+     try {
+       const response = await axios.get(
+         "http://api.weatherapi.com/v1/current.json",
+         {
+           params: {
+             key: "770fc41b657f485f8c160300250107",
+             q: city,
+             api: "yes",
+           },
+         }
+       );
+       if (response.status === 200) {
+         setWeatherData(response.data);
+       }
+     } catch (error) {
+       console.error("Error fetching weather:", error);
+     }
+   },
+   [cityName]
+ );
+
 
   useEffect(() => {
-    getWeather("New York"); // default city
-  }, []);
+   getWeather();
+ }, [getWeather]);
+
 
   const temp = weatherData?.current?.temp_c ?? 12;
   const condition = weatherData?.current?.condition?.text ?? "Mostly Cloudy";
