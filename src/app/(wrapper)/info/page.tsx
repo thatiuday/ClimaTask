@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import type React from "react";
-
 import { Trash2, Plus, GripVertical } from "lucide-react";
 
 type Todo = {
@@ -78,10 +77,10 @@ export default function TodoPage() {
 
       const storedTodos = localStorage.getItem("todos");
       if (storedTodos) {
-        const parsedTodos = JSON.parse(storedTodos);
-        // Add IDs to existing todos if they don't have them
-        const todosWithIds = parsedTodos.map((todo: any, index: number) => ({
-          ...todo,
+        const parsedTodos: Partial<Todo>[] = JSON.parse(storedTodos);
+        const todosWithIds: Todo[] = parsedTodos.map((todo, index) => ({
+          task: todo.task || "",
+          completed: todo.completed ?? false,
           id: todo.id || `${Date.now()}-${index}`,
         }));
         setTodos(todosWithIds);
