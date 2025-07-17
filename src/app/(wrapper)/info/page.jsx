@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { House, Cloudy, Volleyball, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Trash2 } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 export default function Page() {
@@ -36,7 +36,6 @@ export default function Page() {
   useEffect(() => {
     const nameFromStorage = localStorage.getItem("gretingName");
     setGetName(nameFromStorage || "");
-
     const storedTodos = JSON.parse(localStorage.getItem("todos") || "[]");
     setTodos(storedTodos);
 
@@ -73,28 +72,26 @@ export default function Page() {
   }
 
   return (
-    <div className="w-full h-screen bg-white p-10">
+    <div className="w-full min-h-screen bg-white p-4 sm:p-6 md:p-10">
       <div className="h-full flex flex-col">
-        <div className="flex items-start justify-between mb-4 gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4 sm:gap-0">
           <div>
             <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
               {greet}, {getName || "no name to greet"}! <span>👋</span>
             </h1>
             <p className="text-gray-500">{date}</p>
           </div>
-
-          <select className="border rounded-lg px-4 py-2 text-gray-700 bg-white shadow-sm">
+          <select className="border rounded-lg px-4 py-2 text-gray-700 bg-white shadow-sm mt-2 sm:mt-0">
             <option>Today</option>
             <option>Tomorrow</option>
             <option>This weekend</option>
           </select>
         </div>
-
         <DragDropContext onDragEnd={handleDragEnd}>
           <Droppable droppableId="todos">
             {(provided) => (
               <ul
-                className="my-4 space-y-4"
+                className="my-4 space-y-4 flex-1 overflow-y-auto"
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
@@ -138,11 +135,10 @@ export default function Page() {
             )}
           </Droppable>
         </DragDropContext>
-
         {showInput ? (
-          <div className="flex items-center gap-2 justify-start w-full mt-auto text-gray-700 rounded-lg">
+          <div className="flex flex-col sm:flex-row items-center gap-2 justify-start w-full mt-auto text-gray-700 rounded-lg">
             <input
-              className="w-full shadow mb-4 bg-white h-10 border border-gray-200 p-4 rounded-lg"
+              className="w-full shadow mb-2 sm:mb-4 bg-white h-10 border border-gray-200 p-4 rounded-lg"
               type="text"
               placeholder="Enter tasks here"
               value={task}
@@ -152,7 +148,7 @@ export default function Page() {
               }}
             />
             <button
-              className="rounded-lg mb-4 text-white w-[150px] h-[40px] cursor-pointer flex justify-center items-center border border-[#34974d] bg-[#3aa856] p-2"
+              className="rounded-lg mb-4 text-white w-full sm:w-[150px] h-[40px] cursor-pointer flex justify-center items-center border border-[#34974d] bg-[#3aa856] p-2"
               onClick={handleAdd}
             >
               + Add Task
@@ -161,7 +157,7 @@ export default function Page() {
         ) : (
           <button
             onClick={() => setshowInput(true)}
-            className="flex items-center mb-4 justify-start w-1/2 cursor-pointer py-2 text-white px-4 mt-auto rounded-full bg-black transition"
+            className="flex items-center mb-4 justify-center sm:justify-start w-full sm:w-1/2 cursor-pointer py-2 text-white px-4 mt-auto rounded-full bg-black transition"
           >
             + Create new task
           </button>
