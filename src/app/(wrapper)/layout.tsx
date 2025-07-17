@@ -1,14 +1,14 @@
 "use client";
+
 import { Cloudy, Home, House, Volleyball } from "lucide-react";
-import React, { Children } from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>)  {
+}>) {
   const sideBarArray = [
     {
       name: "Home",
@@ -30,32 +30,24 @@ export default function Layout({
     },
   ];
 
-  const route = useRouter();
-
-  function weather() {
-    console.log("weathgerhgbhsbch");
-    route.push("/info/weather");
-  }
-
-  // const geturl = window.location.pathname;
-  // console.log(geturl, "any");
-
+  const router = useRouter();
   const [active, setActive] = useState("Home");
+
   return (
-    <div className="max-h-screen h-screen bg-gradient-to-br from-gray-100 to-white-100   flex w-full flex-row">
-      <div className="flex ">
-        <div className="text-lg font-semibold whitespace-nowrap     p-6">
-          <h1 className="text-lg font-semibold text-gray-800 mb-6">Private </h1>
+    <div className="max-h-screen h-screen bg-gradient-to-br from-gray-100 to-white-100 flex w-full flex-row">
+      <div className="flex">
+        <div className="text-lg font-semibold whitespace-nowrap p-6">
+          <h1 className="text-lg font-semibold text-gray-800 mb-6">Private</h1>
           <div>
-            {sideBarArray.map((item: any, index) => (
+            {sideBarArray.map((item, index) => (
               <div
                 key={index}
                 onClick={() => {
-                  setActive(item?.activeName);
-                  route.push(item.path);
+                  setActive(item.activeName);
+                  router.push(item.path);
                 }}
                 className={`flex items-center rounded-lg gap-2 px-3 py-2 cursor-pointer mb-1 ${
-                  active === item?.activeName
+                  active === item.activeName
                     ? "bg-yellow-500 font-bold"
                     : "hover:bg-blue-300"
                 }`}
@@ -67,7 +59,9 @@ export default function Layout({
           </div>
         </div>
       </div>
-      <div className="h-screen max-h-screen w-full">{children}</div>
+      <div className="h-screen max-h-screen w-full overflow-y-auto">
+        {children}
+      </div>
     </div>
   );
 }
