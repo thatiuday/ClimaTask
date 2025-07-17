@@ -111,7 +111,9 @@ export default function TodoPage() {
       const storedTodos = localStorage.getItem("todos");
       if (storedTodos) {
         const parsedTodos = JSON.parse(storedTodos);
-        const todosWithIds = parsedTodos.map((todo: any, index: number) => ({
+        // Add IDs to existing todos if they don't have them
+        const todosWithIds = parsedTodos.map((todo: Todo, index: number) => ({
+          // Change 'any' to 'Todo' here
           ...todo,
           id: todo.id || `${Date.now()}-${index}`,
           createdAt: todo.createdAt || new Date().toISOString(),
