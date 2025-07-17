@@ -1,149 +1,137 @@
-"use client";
-import { useEffect, useState, useCallback, useMemo } from "react";
-import type React from "react";
-import {
-  Trash2,
-  Plus,
-  GripVertical,
-  CheckCircle2,
-  Circle,
-  Clock,
-} from "lucide-react";
+"use client"
+import { useEffect, useState, useCallback, useMemo } from "react"
+import type React from "react"
+import { Trash2, Plus, GripVertical, CheckCircle2, Circle, Clock, X } from "lucide-react"
 
 type Todo = {
-  task: string;
-  completed: boolean;
-  id: string;
-  createdAt: string;
-};
+  task: string
+  completed: boolean
+  id: string
+  createdAt: string
+}
 
 export default function TodoPage() {
-  const [getName, setGetName] = useState("");
-  const [task, setTask] = useState("");
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [showInput, setShowInput] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(0);
+  const [getName, setGetName] = useState("")
+  const [task, setTask] = useState("")
+  const [todos, setTodos] = useState<Todo[]>([])
+  const [showInput, setShowInput] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState(0)
 
-  const tabs = ["All Tasks", "Completed", "Pending"];
+  const tabs = ["All Tasks", "Completed", "Pending"]
 
   const currentDate = useMemo(() => {
-    const today = new Date();
+    const today = new Date()
     const options: Intl.DateTimeFormatOptions = {
       weekday: "short",
       day: "numeric",
       month: "long",
       year: "numeric",
-    };
-    return `Today, ${today.toLocaleDateString("en-US", options)}`;
-  }, []);
+    }
+    return `Today, ${today.toLocaleDateString("en-US", options)}`
+  }, [])
 
   const greeting = useMemo(() => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 18) return "Good Afternoon";
-    return "Good Evening";
-  }, []);
+    const hour = new Date().getHours()
+    if (hour < 12) return "Good Morning"
+    if (hour < 18) return "Good Afternoon"
+    return "Good Evening"
+  }, [])
 
   const filteredTodos = useMemo(() => {
     switch (activeTab) {
       case 1:
-        return todos.filter((todo) => todo.completed);
+        return todos.filter((todo) => todo.completed)
       case 2:
-        return todos.filter((todo) => !todo.completed);
+        return todos.filter((todo) => !todo.completed)
       default:
-        return todos;
+        return todos
     }
-  }, [todos, activeTab]);
+  }, [todos, activeTab])
 
   const stats = useMemo(() => {
-    const total = todos.length;
-    const completed = todos.filter((todo) => todo.completed).length;
-    const pending = total - completed;
-    const completionRate =
-      total > 0 ? Math.round((completed / total) * 100) : 0;
+    const total = todos.length
+    const completed = todos.filter((todo) => todo.completed).length
+    const pending = total - completed
+    const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0
 
-    return { total, completed, pending, completionRate };
-  }, [todos]);
+    return { total, completed, pending, completionRate }
+  }, [todos])
 
   const handleAdd = useCallback(() => {
-    if (task.trim() === "") return;
+    if (task.trim() === "") return
 
     const newTodo: Todo = {
       task: task.trim(),
       completed: false,
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
-    };
+    }
 
-    setTodos((prev) => [newTodo, ...prev]);
-    setTask("");
-    setShowInput(false);
-  }, [task]);
+    setTodos((prev) => [newTodo, ...prev])
+    setTask("")
+    setShowInput(false)
+  }, [task])
 
   const handleDelete = useCallback((id: string) => {
-    setTodos((prev) => prev.filter((todo) => todo.id !== id));
-  }, []);
+    setTodos((prev) => prev.filter((todo) => todo.id !== id))
+  }, [])
 
   const handleToggleComplete = useCallback((id: string) => {
-    setTodos((prev) =>
-      prev.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
-  }, []);
+    setTodos((prev) => prev.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo)))
+  }, [])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "Enter") {
-        handleAdd();
+        handleAdd()
       }
     },
-    [handleAdd]
-  );
+    [handleAdd],
+  )
 
   // Load data from localStorage
   useEffect(() => {
     try {
-      const nameFromStorage = localStorage.getItem("gretingName");
-      setGetName(nameFromStorage || "");
+      const nameFromStorage = localStorage.getItem("gretingName")
+      setGetName(nameFromStorage || "")
 
-      const storedTodos = localStorage.getItem("todos");
+      const storedTodos = localStorage.getItem("todos")
       if (storedTodos) {
-        const parsedTodos = JSON.parse(storedTodos);
+        const parsedTodos = JSON.parse(storedTodos)
         // Add IDs to existing todos if they don't have them
         const todosWithIds = parsedTodos.map((todo: Todo, index: number) => ({
           // Change 'any' to 'Todo' here
           ...todo,
           id: todo.id || `${Date.now()}-${index}`,
           createdAt: todo.createdAt || new Date().toISOString(),
-        }));
-        setTodos(todosWithIds);
+        }))
+        setTodos(todosWithIds)
       }
     } catch (error) {
-      console.error("Error loading data from localStorage:", error);
+      console.error("Error loading data from localStorage:", error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  }, []);
+  }, [])
 
   // Save todos to localStorage
   useEffect(() => {
     if (!isLoading) {
       try {
-        localStorage.setItem("todos", JSON.stringify(todos));
+        localStorage.setItem("todos", JSON.stringify(todos))
       } catch (error) {
-        console.error("Error saving todos to localStorage:", error);
+        console.error("Error saving todos to localStorage:", error)
       }
     }
-  }, [todos, isLoading]);
+  }, [todos, isLoading])
 
   if (isLoading) {
     return (
       <div className="h-full w-full bg-gray-50 p-4 flex items-center justify-center">
         <div className="text-gray-500">Loading...</div>
       </div>
-    );
+    )
   }
 
   return (
@@ -158,9 +146,7 @@ export default function TodoPage() {
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
                   {greeting}, {getName || "Guest"}! 👋
                 </h1>
-                <p className="text-gray-600 text-sm sm:text-base">
-                  {currentDate}
-                </p>
+                <p className="text-gray-600 text-sm sm:text-base">{currentDate}</p>
               </div>
 
               {/* Stats Display */}
@@ -175,28 +161,20 @@ export default function TodoPage() {
                 <div className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-800 mb-2">
                   {stats.completionRate}%
                 </div>
-                <div className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base text-center">
-                  Tasks Completed
-                </div>
+                <div className="text-gray-500 mb-4 sm:mb-6 text-sm sm:text-base text-center">Tasks Completed</div>
 
                 <div className="space-y-2 text-center">
                   <div className="flex items-center justify-center gap-2">
                     <Circle className="text-gray-400 w-4 h-4" />
-                    <span className="text-gray-600 text-sm">
-                      Total: {stats.total} tasks
-                    </span>
+                    <span className="text-gray-600 text-sm">Total: {stats.total} tasks</span>
                   </div>
                   <div className="flex items-center justify-center gap-2">
                     <CheckCircle2 className="text-green-500 w-4 h-4" />
-                    <span className="text-green-700 text-sm">
-                      Completed: {stats.completed}
-                    </span>
+                    <span className="text-green-700 text-sm">Completed: {stats.completed}</span>
                   </div>
                   <div className="flex items-center justify-center gap-2">
                     <Clock className="text-orange-500 w-4 h-4" />
-                    <span className="text-orange-700 text-sm">
-                      Pending: {stats.pending}
-                    </span>
+                    <span className="text-orange-700 text-sm">Pending: {stats.pending}</span>
                   </div>
                 </div>
               </div>
@@ -205,12 +183,8 @@ export default function TodoPage() {
               <div className="mt-4 sm:mt-8">
                 <div className="bg-white rounded-xl p-4 shadow-md">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium text-gray-700">
-                      Progress
-                    </span>
-                    <span className="text-sm font-bold text-blue-600">
-                      {stats.completionRate}%
-                    </span>
+                    <span className="text-sm font-medium text-gray-700">Progress</span>
+                    <span className="text-sm font-bold text-blue-600">{stats.completionRate}%</span>
                   </div>
                   <div className="w-full h-3 bg-gray-200 rounded-full">
                     <div
@@ -250,16 +224,9 @@ export default function TodoPage() {
                     <div className="text-center py-12 text-gray-500 h-full flex flex-col justify-center">
                       <div className="text-4xl mb-4">📝</div>
                       <p className="text-lg mb-2">
-                        {activeTab === 1
-                          ? "No completed tasks"
-                          : activeTab === 2
-                          ? "No pending tasks"
-                          : "No tasks yet"}
+                        {activeTab === 1 ? "No completed tasks" : activeTab === 2 ? "No pending tasks" : "No tasks yet"}
                       </p>
-                      <p className="text-sm">
-                        {activeTab === 0 &&
-                          "Create your first task to get started!"}
-                      </p>
+                      <p className="text-sm">{activeTab === 0 && "Create your first task to get started!"}</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -272,10 +239,7 @@ export default function TodoPage() {
                             <GripVertical className="w-4 h-4 text-gray-400" />
                           </div>
 
-                          <button
-                            onClick={() => handleToggleComplete(todo.id)}
-                            className="flex-shrink-0"
-                          >
+                          <button onClick={() => handleToggleComplete(todo.id)} className="flex-shrink-0">
                             {todo.completed ? (
                               <CheckCircle2 className="w-5 h-5 text-green-500" />
                             ) : (
@@ -286,9 +250,7 @@ export default function TodoPage() {
                           <div className="flex-1">
                             <span
                               className={`block transition-all duration-200 ${
-                                todo.completed
-                                  ? "line-through text-gray-400"
-                                  : "text-gray-800"
+                                todo.completed ? "line-through text-gray-400" : "text-gray-800"
                               }`}
                             >
                               {todo.task}
@@ -311,8 +273,21 @@ export default function TodoPage() {
                   )}
                 </div>
 
-                {/* Add Task Section */}
-                <div className="flex-shrink-0">
+                {/* Floating Add Task Button - Mobile */}
+                <div className="fixed bottom-6 right-6 z-50 md:hidden">
+                  {!showInput && (
+                    <button
+                      onClick={() => setShowInput(true)}
+                      className="bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 focus:ring-4 focus:ring-blue-300"
+                      aria-label="Create new task"
+                    >
+                      <Plus className="w-6 h-6" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Desktop Add Task Section */}
+                <div className="flex-shrink-0 hidden md:block">
                   {showInput ? (
                     <div className="space-y-3">
                       <input
@@ -334,8 +309,8 @@ export default function TodoPage() {
                         </button>
                         <button
                           onClick={() => {
-                            setShowInput(false);
-                            setTask("");
+                            setShowInput(false)
+                            setTask("")
                           }}
                           className="flex-1 sm:flex-none sm:w-24 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-200"
                         >
@@ -353,11 +328,58 @@ export default function TodoPage() {
                     </button>
                   )}
                 </div>
+
+                {/* Mobile Input Modal Overlay */}
+                {showInput && (
+                  <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end">
+                    <div className="bg-white w-full rounded-t-2xl p-6 space-y-4 animate-slide-up">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-gray-800">Add New Task</h3>
+                        <button
+                          onClick={() => {
+                            setShowInput(false)
+                            setTask("")
+                          }}
+                          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                        >
+                          <X className="w-5 h-5 text-gray-500" />
+                        </button>
+                      </div>
+                      <input
+                        className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        type="text"
+                        placeholder="Enter your task here..."
+                        value={task}
+                        onChange={(e) => setTask(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        autoFocus
+                      />
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleAdd}
+                          disabled={!task.trim()}
+                          className="flex-1 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200"
+                        >
+                          Add Task
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowInput(false)
+                            setTask("")
+                          }}
+                          className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-200"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
