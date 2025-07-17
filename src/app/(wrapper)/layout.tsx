@@ -2,13 +2,13 @@
 import { Cloudy, Home, House, Volleyball } from "lucide-react";
 import React, { Children } from "react";
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
-export default function layout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>)  {
   const sideBarArray = [
     {
       name: "Home",
